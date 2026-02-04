@@ -9,10 +9,25 @@ fn draw_line(
     y1: i32,
     color: Color,
 ) {
+    let dx = x1 - x0;
+    let dy = y1 - y0;
+    let mut d: i32 = 2 * dy - dx;
+    let mut y = y0;
+
     for x in x0..=x1 {
-        let t = (x - x0) as f64 / (x1 - x0) as f64;
-        let y = (y0 as f64 * (1.0 - t) + y1 as f64 * t) as i32;
-        fb.put_pixel(x as u32, y as u32, image::Rgb([color.r, color.g, color.b]));
+        fb.put_pixel(
+            x as u32,
+            y as u32,
+            image::Rgb([color.r, color.g, color.b]),
+        );
+
+        if d > 0 {
+            d += 2 * (dy - dx);
+	    y += 1;
+        } else {
+            d += 2 * dy;
+        }
+
     }
 }
 
