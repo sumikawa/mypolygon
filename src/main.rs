@@ -17,22 +17,40 @@ fn draw_line(
     let sx = (x1 - x0).signum();
     let sy = (y1 - y0).signum();
 
-    let mut d: i32 = 2 * dy - dx;
+    let mut x = x0;
     let mut y = y0;
 
-    for x in (x0..=x1).step_by(sx as usize) {
-        let (screen_x, screen_y) = transform.to_screen(x, y);
-        fb.put_pixel(
-            screen_x as u32,
-            screen_y as u32,
-            image::Rgb([color.r, color.g, color.b]),
-        );
+    if dx >= dy {
+        // x 主軸（横〜斜め）
+        let mut d = 2 * dy - dx;
 
-        if d > 0 {
-            d += 2 * (dy - dx);
+        for _ in 0..=dx {
+            let (sx2, sy2) = transform.to_screen(x, y);
+            fb.put_pixel(sx2 as u32, sy2 as u32, image::Rgb([color.r, color.g, color.b]));
+
+            if d > 0 {
+                y += sy;
+                d += 2 * (dy - dx);
+            } else {
+                d += 2 * dy;
+            }
+            x += sx;
+        }
+    } else {
+        // y 主軸（縦〜急勾配）
+        let mut d = 2 * dx - dy;
+
+        for _ in 0..=dy {
+            let (sx2, sy2) = transform.to_screen(x, y);
+            fb.put_pixel(sx2 as u32, sy2 as u32, image::Rgb([color.r, color.g, color.b]));
+
+            if d > 0 {
+                x += sx;
+                d += 2 * (dx - dy);
+            } else {
+                d += 2 * dx;
+            }
             y += sy;
-        } else {
-            d += 2 * dy;
         }
     }
 }
@@ -50,9 +68,9 @@ fn main() {
         &mut imgbuf,
         &transform,
         30,
-        150,
-        300,
-        30,
+        0,
+        50,
+        200,
         Color::new(255, 255, 0),
     );
 
