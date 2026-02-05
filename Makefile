@@ -14,3 +14,6 @@ time::
 	@date
 	cargo run --release
 	@date
+
+trace::
+	env RUST_BACKTRACE=1 cargo run
