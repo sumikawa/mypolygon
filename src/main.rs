@@ -12,22 +12,25 @@ fn draw_line(
     y1: i32,
     color: Color,
 ) {
-    let dx = x1 - x0;
-    let dy = y1 - y0;
+    let dx = (x1 - x0).abs();
+    let dy = (y1 - y0).abs();
+    let sx = (x1 - x0).signum();
+    let sy = (y1 - y0).signum();
+
     let mut d: i32 = 2 * dy - dx;
     let mut y = y0;
 
-    for x in x0..=x1 {
-        let (sx, sy) = transform.to_screen(x, y);
+    for x in (x0..=x1).step_by(sx as usize) {
+        let (screen_x, screen_y) = transform.to_screen(x, y);
         fb.put_pixel(
-            sx as u32,
-            sy as u32,
+            screen_x as u32,
+            screen_y as u32,
             image::Rgb([color.r, color.g, color.b]),
         );
 
         if d > 0 {
             d += 2 * (dy - dx);
-            y += 1;
+            y += sy;
         } else {
             d += 2 * dy;
         }
@@ -47,9 +50,9 @@ fn main() {
         &mut imgbuf,
         &transform,
         30,
-        30,
-        300,
         150,
+        300,
+        30,
         Color::new(255, 255, 0),
     );
 
