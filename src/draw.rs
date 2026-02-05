@@ -61,3 +61,21 @@ pub fn line(
         }
     }
 }
+
+pub fn polygon_outline(
+    fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
+    transform: &Transform,
+    vertices: &[(i32, i32)],
+    color: Color,
+) {
+    if vertices.len() < 2 {
+        return;
+    }
+
+    vertices
+        .iter()
+        .zip(vertices.iter().cycle().skip(1))
+        .for_each(|(a, b)| {
+            line(fb, transform, a.0, a.1, b.0, b.1, color);
+        });
+}
