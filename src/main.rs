@@ -64,15 +64,28 @@ fn main() {
 
     let mut imgbuf = image::ImageBuffer::new(image_width, image_height);
 
-    draw_line(
-        &mut imgbuf,
-        &transform,
-        30,
-        0,
-        50,
-        200,
-        Color::new(255, 255, 0),
-    );
+    for x in 0..image_width {
+        draw_line(
+            &mut imgbuf,
+            &transform,
+            0,
+            0,
+            x as i32,
+            (image_height - 1) as i32,
+            Color::new((255 * x / image_width / 2) as u8, 255 - (255 * x / image_width) as u8, 0),
+        );
+    }
+    for y in 0..image_height {
+        draw_line(
+            &mut imgbuf,
+            &transform,
+            0,
+            0,
+            (image_width - 1) as i32,
+            y as i32,
+            Color::new(((255 * y / image_width / 2) + 128) as u8, 0, 255 - (255 * y / image_width) as u8),
+        );
+    }
 
     imgbuf.save("output.png").unwrap();
 }
