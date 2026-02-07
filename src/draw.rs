@@ -97,7 +97,7 @@ pub fn polygon_fill(
         let x01 = verts[0].x + (verts[1].x - verts[0].x) * dy / (verts[1].y - verts[0].y);
         let x02 = verts[0].x + (verts[2].x - verts[0].x) * dy / (verts[2].y - verts[0].y);
 
-        let left_x  = x01.min(x02);
+        let left_x = x01.min(x02);
         let right_x = x01.max(x02);
 
         line(fb, transform, left_x, y, right_x, y, color);
@@ -110,9 +110,9 @@ pub fn polygon_fill(
         let x01 = verts[2].x + (verts[0].x - verts[2].x) * dy / (verts[0].y - verts[2].y);
         let x02 = verts[2].x + (verts[1].x - verts[2].x) * dy / (verts[1].y - verts[2].y);
 
-        let left_x  = x01.min(x02);
+        let left_x = x01.min(x02);
         let right_x = x01.max(x02);
 
-        line(fb, transform, left_x, y, right_x, y, Color::new(255, 0, 0));
+        line(fb, transform, left_x, y, right_x, y, color);
     }
 }

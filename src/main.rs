@@ -1,8 +1,9 @@
 use mypolygon::color::Color;
 use mypolygon::config::Settings;
-use mypolygon::draw::{polygon_fill, polygon_outline};
+use mypolygon::draw::polygon_fill;
 use mypolygon::transform::Transform;
 use mypolygon::triangle::{Triangle, Vec2};
+use rand::Rng;
 
 fn main() {
     let settings = Settings::new();
@@ -11,17 +12,35 @@ fn main() {
     let image_height = (image_width as f64 / aspect_ratio) as u32;
     let transform = Transform::new(image_height as i32);
 
-    let mut imgbuf = image::ImageBuffer::new(image_width, image_height);
+    let mut rng = rand::rng();
+    let mut imgbuf = image::ImageBuffer::new(image_width as u32, image_height as u32);
 
-    let tri = Triangle {
-        v0: Vec2 { x: 80, y: 30 },
-        v1: Vec2 { x: 180, y: 120 },
-        v2: Vec2 { x: 130, y: 210 },
-    };
-    polygon_fill(&mut imgbuf, &transform, &tri, Color::new(0, 0, 255));
-
-    let tri2 = [(80, 30), (180, 120), (130, 210)];
-    polygon_outline(&mut imgbuf, &transform, &tri2, Color::new(0, 255, 255));
+    for _ in 1..100 {
+        let tri = Triangle {
+            v0: Vec2 {
+                x: rng.random_range(0..image_width as i32),
+                y: rng.random_range(0..image_height as i32),
+            },
+            v1: Vec2 {
+                x: rng.random_range(0..image_width as i32),
+                y: rng.random_range(0..image_height as i32),
+            },
+            v2: Vec2 {
+                x: rng.random_range(0..image_width as i32),
+                y: rng.random_range(0..image_height as i32),
+            },
+        };
+        polygon_fill(
+            &mut imgbuf,
+            &transform,
+            &tri,
+            Color::new(
+                rng.random_range(0..=255),
+                rng.random_range(0..=255),
+                rng.random_range(0..=255),
+            ),
+        );
+    }
 
     imgbuf.save("output.png").unwrap();
 }
