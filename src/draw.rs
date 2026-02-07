@@ -8,9 +8,9 @@ fn edge(a: Vec2, b: Vec2, p: Vec2) -> f64 {
 }
 
 fn barycentric(triangle: &Triangle, p: Vec2) -> Option<(f64, f64, f64)> {
-    let v0 = Vec2::from(triangle.v0.pos);
-    let v1 = Vec2::from(triangle.v1.pos);
-    let v2 = Vec2::from(triangle.v2.pos);
+    let v0 = triangle.v0.pos;
+    let v1 = triangle.v1.pos;
+    let v2 = triangle.v2.pos;
 
     let area = edge(v0, v1, v2);
     if area == 0.0 {
