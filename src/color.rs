@@ -2,13 +2,13 @@ use std::fmt;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
+    pub r: f64,
+    pub g: f64,
+    pub b: f64,
 }
 
 impl Color {
-    pub fn new(r: u8, g: u8, b: u8) -> Self {
+    pub fn new(r: f64, g: f64, b: f64) -> Self {
         Self { r, g, b }
     }
 }
@@ -21,6 +21,6 @@ impl fmt::Display for Color {
 
 impl Default for Color {
     fn default() -> Self {
-        Self::new(0, 0, 0)
+        Self::new(0.0, 0.0, 0.0)
     }
 }

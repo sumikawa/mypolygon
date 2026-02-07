@@ -1,118 +1,71 @@
 use crate::color::Color;
 use crate::transform::Transform;
-use crate::triangle::Triangle;
+use crate::triangle::{Triangle, Vec2};
 use image::ImageBuffer;
 
-pub fn line(
-    fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
-    transform: &Transform,
-    x0: i32,
-    y0: i32,
-    x1: i32,
-    y1: i32,
-    color: Color,
-) {
-    let dx = (x1 - x0).abs();
-    let dy = (y1 - y0).abs();
-    let sx = (x1 - x0).signum();
-    let sy = (y1 - y0).signum();
+fn edge(a: Vec2, b: Vec2, p: Vec2) -> i32 {
+    (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x)
+}
 
-    let mut x = x0;
-    let mut y = y0;
+fn barycentric(triangle: &Triangle, p: Vec2) -> Option<(f64, f64, f64)> {
+    let v0 = triangle.v0.pos;
+    let v1 = triangle.v1.pos;
+    let v2 = triangle.v2.pos;
 
-    if dx >= dy {
-        // x 主軸（横〜斜め）
-        let mut d = 2 * dy - dx;
+    let area = edge(v0, v1, v2) as f64;
+    if area == 0.0 {
+        return None;
+    }
 
-        for _ in 0..=dx {
-            let (sx2, sy2) = transform.to_screen(x, y);
-            fb.put_pixel(
-                sx2 as u32,
-                sy2 as u32,
-                image::Rgb([color.r, color.g, color.b]),
-            );
+    let w0 = edge(v1, v2, p) as f64 / area;
+    let w1 = edge(v2, v0, p) as f64 / area;
+    let w2 = 1.0 - w0 - w1; // w2 = edge(v0, v1, p) as f64 / area;
 
-            if d > 0 {
-                y += sy;
-                d += 2 * (dy - dx);
-            } else {
-                d += 2 * dy;
-            }
-            x += sx;
-        }
+    if w0 >= 0.0 && w1 >= 0.0 && w2 >= 0.0 {
+        Some((w0, w1, w2))
     } else {
-        // y 主軸（縦〜急勾配）
-        let mut d = 2 * dx - dy;
-
-        for _ in 0..=dy {
-            let (sx2, sy2) = transform.to_screen(x, y);
-            fb.put_pixel(
-                sx2 as u32,
-                sy2 as u32,
-                image::Rgb([color.r, color.g, color.b]),
-            );
-
-            if d > 0 {
-                x += sx;
-                d += 2 * (dx - dy);
-            } else {
-                d += 2 * dx;
-            }
-            y += sy;
-        }
+        None
     }
 }
 
-pub fn polygon_outline(
-    fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
-    transform: &Transform,
-    vertices: &[(i32, i32)],
-    color: Color,
-) {
-    if vertices.len() < 2 {
-        return;
-    }
+fn interpolate_color(triangle: &Triangle, w0: f64, w1: f64, w2: f64) -> Color {
+    let v0 = triangle.v0;
+    let v1 = triangle.v1;
+    let v2 = triangle.v2;
 
-    vertices
-        .iter()
-        .zip(vertices.iter().cycle().skip(1))
-        .for_each(|(a, b)| {
-            line(fb, transform, a.0, a.1, b.0, b.1, color);
-        });
+    let r = w0 * v0.color.r + w1 * v1.color.r + w2 * v2.color.r;
+    let g = w0 * v0.color.g + w1 * v1.color.g + w2 * v2.color.g;
+    let b = w0 * v0.color.b + w1 * v1.color.b + w2 * v2.color.b;
+
+    Color::new(r, g, b)
 }
 
 pub fn polygon_fill(
     fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
     transform: &Transform,
     triangle: &Triangle,
-    color: Color,
 ) {
-    let mut verts = [triangle.v0, triangle.v1, triangle.v2];
-    verts.sort_by_key(|v| v.y); // sort vertex as v0.y <= v1.y <= v2.y
+    let min_x = triangle.v0.pos.x.min(triangle.v1.pos.x.min(triangle.v2.pos.x));
+    let max_x = triangle.v0.pos.x.max(triangle.v1.pos.x.max(triangle.v2.pos.x));
+    let min_y = triangle.v0.pos.y.min(triangle.v1.pos.y.min(triangle.v2.pos.y));
+    let max_y = triangle.v0.pos.y.max(triangle.v1.pos.y.max(triangle.v2.pos.y));
 
-    // scanline for first half
-    for y in verts[0].y..verts[1].y {
-        let dy = y - verts[0].y;
+    for j in min_y..=max_y {
+        for i in min_x..=max_x {
+            let p = Vec2 { x: i, y: j };
+            if let Some((w0, w1, w2)) = barycentric(triangle, p) {
+                let color = interpolate_color(triangle, w0, w1, w2);
+                let rgb = image::Rgb([
+                    (color.r.clamp(0.0, 1.0) * 255.0) as u8,
+                    (color.g.clamp(0.0, 1.0) * 255.0) as u8,
+                    (color.b.clamp(0.0, 1.0) * 255.0) as u8,
+                ]);
 
-        let x01 = verts[0].x + (verts[1].x - verts[0].x) * dy / (verts[1].y - verts[0].y);
-        let x02 = verts[0].x + (verts[2].x - verts[0].x) * dy / (verts[2].y - verts[0].y);
-
-        let left_x = x01.min(x02);
-        let right_x = x01.max(x02);
-
-        line(fb, transform, left_x, y, right_x, y, color);
-    }
-
-    // scanline for second half
-    for y in verts[1].y..verts[2].y {
-        let dy = y - verts[2].y;
-
-        let x01 = verts[2].x + (verts[0].x - verts[2].x) * dy / (verts[0].y - verts[2].y);
-        let x02 = verts[2].x + (verts[1].x - verts[2].x) * dy / (verts[1].y - verts[2].y);
-
-        let left_x = x01.min(x02);
-        let right_x = x01.max(x02);
-
-        line(fb, transform, left_x, y, right_x, y, color);
+                let (sx, sy) = transform.to_screen(i, j);
+                if sx >= 0 && sx < fb.width() as i32 && sy >= 0 && sy < fb.height() as i32 {
+                    fb.put_pixel(sx as u32, sy as u32, rgb);
+                }
+            }
+        }
     }
 }
