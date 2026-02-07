@@ -15,15 +15,15 @@ fn main() {
 
     let tri = Triangle {
         v0: Vertex {
-            pos: Vec2 { x: 80, y: 30 },
+            pos: Vec2 { x: 80.0, y: 30.0 },
             color: Color::new(0.0, 0.0, 1.0),
         },
         v1: Vertex {
-            pos: Vec2 { x: 180, y: 120 },
+            pos: Vec2 { x: 180.0, y: 120.0 },
             color: Color::new(0.0, 1.0, 0.0),
         },
         v2: Vertex {
-            pos: Vec2 { x: 130, y: 210 },
+            pos: Vec2 { x: 130.0, y: 210.0 },
             color: Color::new(1.0, 0.0, 0.0),
         },
     };
