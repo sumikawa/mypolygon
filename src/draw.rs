@@ -1,5 +1,6 @@
 use crate::color::Color;
 use crate::transform::Transform;
+use crate::triangle::Triangle;
 use image::ImageBuffer;
 
 pub fn line(
@@ -78,4 +79,40 @@ pub fn polygon_outline(
         .for_each(|(a, b)| {
             line(fb, transform, a.0, a.1, b.0, b.1, color);
         });
+}
+
+pub fn polygon_fill(
+    fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
+    transform: &Transform,
+    triangle: &Triangle,
+    color: Color,
+) {
+    let mut verts = [triangle.v0, triangle.v1, triangle.v2];
+    verts.sort_by_key(|v| v.y); // sort vertex as v0.y <= v1.y <= v2.y
+
+    // scanline for first half
+    for y in verts[0].y..verts[1].y {
+        let dy = y - verts[0].y;
+
+        let x01 = verts[0].x + (verts[1].x - verts[0].x) * dy / (verts[1].y - verts[0].y);
+        let x02 = verts[0].x + (verts[2].x - verts[0].x) * dy / (verts[2].y - verts[0].y);
+
+        let left_x  = x01.min(x02);
+        let right_x = x01.max(x02);
+
+        line(fb, transform, left_x, y, right_x, y, color);
+    }
+
+    // scanline for second half
+    for y in verts[1].y..verts[2].y {
+        let dy = y - verts[2].y;
+
+        let x01 = verts[2].x + (verts[0].x - verts[2].x) * dy / (verts[0].y - verts[2].y);
+        let x02 = verts[2].x + (verts[1].x - verts[2].x) * dy / (verts[1].y - verts[2].y);
+
+        let left_x  = x01.min(x02);
+        let right_x = x01.max(x02);
+
+        line(fb, transform, left_x, y, right_x, y, Color::new(255, 0, 0));
+    }
 }

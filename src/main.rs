@@ -1,7 +1,8 @@
 use mypolygon::color::Color;
 use mypolygon::config::Settings;
-use mypolygon::draw::polygon_outline;
+use mypolygon::draw::{polygon_fill, polygon_outline};
 use mypolygon::transform::Transform;
+use mypolygon::triangle::{Triangle, Vec2};
 
 fn main() {
     let settings = Settings::new();
@@ -12,14 +13,15 @@ fn main() {
 
     let mut imgbuf = image::ImageBuffer::new(image_width, image_height);
 
-    let tri = [(80, 70), (180, 70), (130, 170)];
-    polygon_outline(&mut imgbuf, &transform, &tri, Color::new(0, 0, 255));
+    let tri = Triangle {
+        v0: Vec2 { x: 80, y: 30 },
+        v1: Vec2 { x: 180, y: 120 },
+        v2: Vec2 { x: 130, y: 210 },
+    };
+    polygon_fill(&mut imgbuf, &transform, &tri, Color::new(0, 0, 255));
 
-    let rect = [(30, 30), (130, 30), (130, 80), (30, 80)];
-    polygon_outline(&mut imgbuf, &transform, &rect, Color::new(255, 0, 255));
-
-    let concave = [ (150, 50), (250, 50), (250, 150), (200, 100), (150, 150)];
-    polygon_outline(&mut imgbuf, &transform, &concave, Color::new(255, 255, 0));
+    let tri2 = [(80, 30), (180, 120), (130, 210)];
+    polygon_outline(&mut imgbuf, &transform, &tri2, Color::new(0, 255, 255));
 
     imgbuf.save("output.png").unwrap();
 }
