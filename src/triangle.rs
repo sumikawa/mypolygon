@@ -2,7 +2,7 @@ use crate::color::Color;
 
 #[derive(Copy, Clone)]
 pub struct Vertex {
-    pub pos: Vec2,
+    pub pos: Vec3,
     pub z: f64,
     pub color: Color,
 }
@@ -14,9 +14,10 @@ pub struct Pixel {
 }
 
 #[derive(Copy, Clone)]
-pub struct Vec2 {
+pub struct Vec3 {
     pub x: f64,
     pub y: f64,
+    pub z: f64,
 }
 
 pub struct Triangle {
@@ -40,12 +41,13 @@ impl Triangle {
     }
 }
 
-impl From<Pixel> for Vec2 {
+impl From<Pixel> for Vec3 {
     fn from(item: Pixel) -> Self {
-        Vec2 {
+        Vec3 {
             // Convert to center pixel by adding 0.5
             x: item.x as f64 + 0.5,
             y: item.y as f64 + 0.5,
+            z: 0.0
         }
     }
 }

@@ -1,14 +1,14 @@
 use crate::color::Color;
 use crate::transform::Transform;
-use crate::triangle::{Pixel, Triangle, Vec2};
+use crate::triangle::{Pixel, Triangle, Vec3};
 use crate::zbuffer::ZBuffer;
 use image::ImageBuffer;
 
-fn edge(a: Vec2, b: Vec2, p: Vec2) -> f64 {
+fn edge(a: Vec3, b: Vec3, p: Vec3) -> f64 {
     (p.x - a.x) * (b.y - a.y) - (p.y - a.y) * (b.x - a.x)
 }
 
-fn barycentric(triangle: &Triangle, p: Vec2) -> Option<(f64, f64, f64)> {
+fn barycentric(triangle: &Triangle, p: Vec3) -> Option<(f64, f64, f64)> {
     let v0 = triangle.v0.pos;
     let v1 = triangle.v1.pos;
     let v2 = triangle.v2.pos;
@@ -48,7 +48,7 @@ pub fn polygon_fill(
     for j in min_y..=max_y {
         for i in min_x..=max_x {
             let pixel = Pixel { x: i, y: j };
-            let p = Vec2::from(pixel);
+            let p = Vec3::from(pixel);
 
             if let Some((w0, w1, w2)) = barycentric(triangle, p) {
                 let color = interpolate_color(triangle, w0, w1, w2);
