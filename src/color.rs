@@ -57,3 +57,13 @@ impl Mul<Color> for f64 {
         rhs * self
     }
 }
+
+impl Into<image::Rgb<u8>> for Color {
+    fn into(self) -> image::Rgb<u8> {
+        let r = (self.r.clamp(0.0, 0.999) * 256.0) as u8;
+        let g = (self.g.clamp(0.0, 0.999) * 256.0) as u8;
+        let b = (self.b.clamp(0.0, 0.999) * 256.0) as u8;
+
+        image::Rgb([r, g, b])
+    }
+}

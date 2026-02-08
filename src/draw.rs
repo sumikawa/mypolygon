@@ -55,11 +55,6 @@ pub fn polygon_fill(
 
             if let Some((w0, w1, w2)) = barycentric(triangle, p) {
                 let color = interpolate_color(triangle, w0, w1, w2);
-                let rgb = image::Rgb([
-                    (color.r.clamp(0.0, 1.0) * 255.0) as u8,
-                    (color.g.clamp(0.0, 1.0) * 255.0) as u8,
-                    (color.b.clamp(0.0, 1.0) * 255.0) as u8,
-                ]);
 
                 if let Some((sx, sy)) = transform.to_screen(i, j) {
                     let idx = zbuffer.index(sx, sy);
@@ -67,7 +62,7 @@ pub fn polygon_fill(
 
                     if z < zbuffer.data[idx] {
                         zbuffer.data[idx] = z;
-                        fb.put_pixel(sx, sy, rgb);
+                        fb.put_pixel(sx, sy, color.into());
                     }
                 }
             }
