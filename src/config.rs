@@ -5,6 +5,7 @@ use std::fs;
 pub struct Settings {
     pub aspect_ratio: f64,
     pub image_width: u32,
+    pub output_filename: String,
 }
 
 impl Default for Settings {

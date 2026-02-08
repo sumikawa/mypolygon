@@ -29,5 +29,5 @@ fn main() {
     };
     polygon_fill(&mut imgbuf, &transform, &tri);
 
-    imgbuf.save("output.png").unwrap();
+    imgbuf.save(&settings.output_filename).unwrap();
 }
