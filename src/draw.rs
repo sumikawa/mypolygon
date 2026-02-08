@@ -43,10 +43,7 @@ pub fn polygon_fill(
     zbuffer: &mut ZBuffer,
     triangle: &Triangle,
 ) {
-    let min_x = triangle.v0.pos.x.min(triangle.v1.pos.x.min(triangle.v2.pos.x)) as i32;
-    let max_x = triangle.v0.pos.x.max(triangle.v1.pos.x.max(triangle.v2.pos.x)) as i32;
-    let min_y = triangle.v0.pos.y.min(triangle.v1.pos.y.min(triangle.v2.pos.y)) as i32;
-    let max_y = triangle.v0.pos.y.max(triangle.v1.pos.y.max(triangle.v2.pos.y)) as i32;
+    let (min_x, max_x, min_y, max_y) = triangle.bounding_box();
 
     for j in min_y..=max_y {
         for i in min_x..=max_x {

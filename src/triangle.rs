@@ -25,6 +25,21 @@ pub struct Triangle {
     pub v2: Vertex,
 }
 
+impl Triangle {
+    pub fn bounding_box(&self) -> (i32, i32, i32, i32) {
+        let v0 = self.v0.pos;
+        let v1 = self.v1.pos;
+        let v2 = self.v2.pos;
+
+        let min_x = v0.x.min(v1.x.min(v2.x)).floor();
+        let max_x = v0.x.max(v1.x.max(v2.x)).ceil();
+        let min_y = v0.y.min(v1.y.min(v2.y)).floor();
+        let max_y = v0.y.max(v1.y.max(v2.y)).ceil();
+
+        (min_x as i32, max_x as i32, min_y as i32, max_y as i32)
+    }
+}
+
 impl From<Pixel> for Vec2 {
     fn from(item: Pixel) -> Self {
         Vec2 {
