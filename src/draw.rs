@@ -1,6 +1,7 @@
 use crate::color::Color;
 use crate::transform::Transform;
 use crate::triangle::{Pixel, Triangle, Vec2};
+use crate::zbuffer::ZBuffer;
 use image::ImageBuffer;
 
 fn edge(a: Vec2, b: Vec2, p: Vec2) -> f64 {
@@ -40,7 +41,12 @@ fn interpolate_color(triangle: &Triangle, w0: f64, w1: f64, w2: f64) -> Color {
     Color::new(r, g, b)
 }
 
-pub fn polygon_fill(fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>, transform: &Transform, triangle: &Triangle) {
+pub fn polygon_fill(
+    fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>,
+    transform: &Transform,
+    zbuffer: &mut ZBuffer,
+    triangle: &Triangle,
+) {
     let min_x = triangle.v0.pos.x.min(triangle.v1.pos.x.min(triangle.v2.pos.x)) as i32;
     let max_x = triangle.v0.pos.x.max(triangle.v1.pos.x.max(triangle.v2.pos.x)) as i32;
     let min_y = triangle.v0.pos.y.min(triangle.v1.pos.y.min(triangle.v2.pos.y)) as i32;
@@ -60,7 +66,13 @@ pub fn polygon_fill(fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>, transform: &T
                 ]);
 
                 if let Some((sx, sy)) = transform.to_screen(i, j) {
-                    fb.put_pixel(sx, sy, rgb);
+                    let idx = zbuffer.index(sx, sy);
+                    let z: f64 = w0 * triangle.v0.z + w1 * triangle.v1.z + w2 * triangle.v2.z;
+
+                    if z < zbuffer.data[idx] {
+                        zbuffer.data[idx] = z;
+                        fb.put_pixel(sx, sy, rgb);
+                    }
                 }
             }
         }

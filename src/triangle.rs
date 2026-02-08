@@ -3,6 +3,7 @@ use crate::color::Color;
 #[derive(Copy, Clone)]
 pub struct Vertex {
     pub pos: Vec2,
+    pub z: f64,
     pub color: Color,
 }
 
