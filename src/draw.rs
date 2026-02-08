@@ -34,11 +34,7 @@ fn interpolate_color(triangle: &Triangle, w0: f64, w1: f64, w2: f64) -> Color {
     let v1 = triangle.v1;
     let v2 = triangle.v2;
 
-    let r = w0 * v0.color.r + w1 * v1.color.r + w2 * v2.color.r;
-    let g = w0 * v0.color.g + w1 * v1.color.g + w2 * v2.color.g;
-    let b = w0 * v0.color.b + w1 * v1.color.b + w2 * v2.color.b;
-
-    Color::new(r, g, b)
+    w0 * v0.color + w1 * v1.color + w2 * v2.color
 }
 
 pub fn polygon_fill(
