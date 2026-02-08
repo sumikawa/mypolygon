@@ -1,6 +1,7 @@
 use crate::color::Color;
 use crate::transform::Transform;
-use crate::triangle::{Pixel, Triangle, Vec3};
+use crate::triangle::{Pixel, Triangle};
+use crate::vec3::Vec3;
 use crate::zbuffer::ZBuffer;
 use image::ImageBuffer;
 

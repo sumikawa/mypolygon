@@ -1,4 +1,5 @@
 use crate::color::Color;
+use crate::vec3::Vec3;
 
 #[derive(Copy, Clone)]
 pub struct Vertex {
@@ -11,13 +12,6 @@ pub struct Vertex {
 pub struct Pixel {
     pub x: i32,
     pub y: i32,
-}
-
-#[derive(Copy, Clone)]
-pub struct Vec3 {
-    pub x: f64,
-    pub y: f64,
-    pub z: f64,
 }
 
 pub struct Triangle {
@@ -38,16 +32,5 @@ impl Triangle {
         let max_y = v0.y.max(v1.y.max(v2.y)).ceil();
 
         (min_x as i32, max_x as i32, min_y as i32, max_y as i32)
-    }
-}
-
-impl From<Pixel> for Vec3 {
-    fn from(item: Pixel) -> Self {
-        Vec3 {
-            // Convert to center pixel by adding 0.5
-            x: item.x as f64 + 0.5,
-            y: item.y as f64 + 0.5,
-            z: 0.0
-        }
     }
 }
