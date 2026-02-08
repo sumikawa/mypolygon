@@ -59,9 +59,8 @@ pub fn polygon_fill(fb: &mut ImageBuffer<image::Rgb<u8>, Vec<u8>>, transform: &T
                     (color.b.clamp(0.0, 1.0) * 255.0) as u8,
                 ]);
 
-                let (sx, sy) = transform.to_screen(i, j);
-                if sx >= 0 && sx < fb.width() as i32 && sy >= 0 && sy < fb.height() as i32 {
-                    fb.put_pixel(sx as u32, sy as u32, rgb);
+                if let Some((sx, sy)) = transform.to_screen(i, j) {
+                    fb.put_pixel(sx, sy, rgb);
                 }
             }
         }
