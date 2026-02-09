@@ -56,6 +56,12 @@ impl Camera {
             z: v.z,
         })
     }
+
+    fn ndc_to_pixel(&self, ndc: Vec3, width: u32, height: u32) -> (i32, i32) {
+        let x = ((ndc.x + 1.0) * 0.5 * width as f64) as i32;
+        let y = ((ndc.y + 1.0) * 0.5 * height as f64) as i32;
+        (x, y)
+    }
 }
 
 #[cfg(test)]
